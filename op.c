@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "system.h"
+#include "reg.h"
 #include "str.h"
 #include "op.h"
 
