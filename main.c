@@ -5,19 +5,7 @@
 #include "errors.h"
 #include "op.h"
 #include "dasm.h"
-
-size_t file_getSize(FILE* f)
-{
-	fseek(f, 0, SEEK_END);
-	size_t fsize = ftell(f);
-	fseek(f, 0, SEEK_SET);
-	return fsize;
-}
-
-int file_load(FILE* f, void* buf, size_t size)
-{
-	fread(buf, 1, size, f);
-}
+#include "system.h"
 
 int print_usage(const char* command)
 {
@@ -30,25 +18,16 @@ int main(int argc, char** argv)
 	if (argc != 2)
 		return print_usage(argv[0]);
 	
-	FILE* f = fopen(argv[1], "rb");
-	if (!f) {
-		printf("error: Couldn't open %s\n", argv[1]);
-		exit(1);
-	}
+	const char* file = argv[1];
 	
-	size_t size = file_getSize(f);
-	
-	uint16_t* buf = malloc(size);
-	file_load(f, buf, size);
-	
-	fclose(f);
+	system_init();
+	system_load(file);
+	uint16_t* rom = system_getRom();
+	size_t size   = system_getSize();
 	
 	int i;
-	for (i=0; i<size; i++)
-		buf[i] = htobe16(buf[i]);
-	
 	for (i=0; i<size; i++) {
-		dasm_op(i + 0x200, buf[i]);
+		dasm_op(i, rom[i]);
 		printf("\n");
 	}
 	return 0;

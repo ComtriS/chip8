@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdint.h>
+#include "system.h"
 
 void dasm_op(uint16_t pc, uint16_t op)
 {
-	printf("%04X %04X  ", pc, op);
+	printf("%04X %04X  ", pc + SYSTEM_BASE_PC, op);
 	uint8_t nibble1 = op >> 12 & 0xF;
 	uint8_t nibble2 = op >> 8  & 0xF;
 	uint8_t nibble3 = op >> 4  & 0xF;
