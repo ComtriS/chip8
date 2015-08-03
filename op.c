@@ -9,12 +9,12 @@ static int op_error(word_t op)
 	return OP_ERR_BAD_INST;
 }
 
-static void op_print(word_t op)
+void op_print(word_t op)
 {
 	printf("0x%04X", op);
 }
 
-static const char* op_status(int status)
+const char* op_status(int status)
 {
 	switch (status) {
 		case OP_ERR_GENERIC:      return STR(OP_ERR_GENERIC);
@@ -442,7 +442,5 @@ int op_do(word_t op)
 {
 	int status = op_XXXX(op);
 	system_incPC();
-	op_print(op);
-	printf(" => %s\n", op_status(status));
 	return status;
 }

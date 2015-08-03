@@ -82,6 +82,9 @@ void system_decPC(void)
 
 void system_start(bool debug)
 {
+	if (!debug)
+		display_init();
+	
 	uint16_t* rom = system_getRom();
 	size_t size   = system_getSize();
 	
@@ -89,10 +92,19 @@ void system_start(bool debug)
 	int status;
 	do {
 		word_t op = *(word_t*)&chip8.ram.bytes[chip8.PC];
-		dasm_op(chip8.PC, op);
-		printf("\n");
-		printf("%5d] ", count++);
+		
+		if (debug) {
+			dasm_op(chip8.PC, op);
+			printf("\n");
+			printf("%5d] ", count++);
+			op_print(op);
+		}
+		
 		status = op_do(op);
+		
+		if (debug)
+			printf(" => %s\n", op_status(status));
+		
 	} while (status == SUCCESS);
 }
 
