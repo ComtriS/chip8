@@ -94,6 +94,11 @@ void system_start(bool debug)
 	} while (status == SUCCESS);
 }
 
+void system_halt(void)
+{
+	exit(1);
+}
+
 int system_destroy(void)
 {
 	free(rom_bin);

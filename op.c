@@ -60,6 +60,11 @@ static int op_1XXX(word_t op)
 {
 	int nnn = (op >> 0) & 0xFFF;
 	
+	if (chip8.PC == nnn) {
+		printf("ERROR: infinite loop detected. Halting.\n");
+		system_halt();
+	}
+	
 	chip8.PC = nnn;
 	
 	system_decPC();    // to avoid later increment
@@ -234,7 +239,7 @@ static int op_CXXX(word_t op)
 // toggles the screen pixels)
 static int op_DXXX(word_t op)
 {
-	return ERR_NOT_IMPLEMENTED;
+	return SUCCESS;
 }
 
 // EX9E: Skips the next instruction if the key stored in VX is pressed
