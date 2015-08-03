@@ -27,8 +27,8 @@ static const char* op_status(int status)
 // 00E0: Clears the screen
 static int op_00E0()
 {
-	// screen_clear();
-	return ERR_NOT_IMPLEMENTED;
+	display_clear();
+	return SUCCESS;
 }
 
 // 00EE: Returns from a subroutine
