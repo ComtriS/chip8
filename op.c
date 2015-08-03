@@ -127,8 +127,12 @@ static int op_6XXX(word_t op)
 // 7XNN: Adds NN to VX
 static int op_7XXX(word_t op)
 {
-	// set(&v[n[2]], v[n[2]] + b[0]);
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	int nn = (op >> 0) & 0xFF;
+	
+	chip8.V[x] += nn;
+	
+	return SUCCESS;
 }
 
 // 8XYZ: Performs ALU instruction Z on VX and VY
