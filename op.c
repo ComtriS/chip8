@@ -332,8 +332,16 @@ static int op_FX33(word_t op)
 // FX55: Stores V0 to VX in memory starting at address I
 static int op_FX55(word_t op)
 {
-	// return ram_save(v[n[2]]);         
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	
+	uint8_t* ram = chip8.ram.bytes;
+	ram += chip8.I;
+	
+	int i;
+	for (i=0; i<=x; i++)
+		ram[i] = chip8.V[i];
+	
+	return SUCCESS;
 }
 
 // FX65: Fills V0 to VX with values from memory starting at address I
