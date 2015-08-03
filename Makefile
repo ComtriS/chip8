@@ -1,7 +1,14 @@
+BINDIR=bin
 SRCS=$(wildcard *.c)
 OBJS=$(patsubst %.c,%.o,SRCS)
 
-all: chip8
+${BINDIR}/chip8: ${BINDIR}
+	@gcc ${SRCS} -o $@
 
-chip8:
-	gcc ${SRCS} -o chip8
+${BINDIR}:
+	@mkdir -p $@
+
+all: ${BINDIR}/chip8
+
+clean:
+	@rm -rf ${BINDIR}
