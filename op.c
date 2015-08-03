@@ -401,10 +401,11 @@ static int op_XXXX(word_t op)
 	}
 }
 
-void op_do(word_t op)
+int op_do(word_t op)
 {
 	int status = op_XXXX(op);
 	system_incPC();
 	op_print(op);
 	printf(" => %s\n", op_status(status));
+	return status;
 }

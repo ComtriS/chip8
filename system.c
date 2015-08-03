@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <endian.h>
+#include <assert.h>
 #include "system.h"
 #include "errors.h"
 #include "op.h"
@@ -52,6 +53,11 @@ int system_load(const char* rom)
 	int i;
 	for (i=0; i<rom_size; i++)
 		rom_bin[i] = be16toh(rom_bin[i]);
+	
+	memcpy(chip8.ram.program, rom_bin, file_size);
+	
+	for (i=0; i<rom_size; i++)
+		assert(*(uint16_t*)&chip8.ram.bytes[0x200 + i*2] == rom_bin[i]);
 }
 
 size_t system_getSize(void)
@@ -79,12 +85,13 @@ void system_start(bool debug)
 	uint16_t* rom = system_getRom();
 	size_t size   = system_getSize();
 	
-	int i;
-	for (i=0; i<size; i++) {
-		dasm_op(i, rom[i]);
+	int status;
+	do {
+		word_t op = *(word_t*)&chip8.ram.bytes[chip8.PC];
+		dasm_op(chip8.PC, op);
 		printf("\n");
-		op_do(rom[i]);
-	}
+		status = op_do(op);
+	} while (status == SUCCESS);
 }
 
 int system_destroy(void)

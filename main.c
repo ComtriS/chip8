@@ -28,8 +28,6 @@ int main(int argc, char** argv)
 	
 	system_init();
 	system_load(file);
-	uint16_t* rom = system_getRom();
-	size_t size   = system_getSize();
 	
 	if (dasm)
 		dasm_dump();

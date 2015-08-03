@@ -4,7 +4,7 @@
 
 void dasm_op(uint16_t pc, uint16_t op)
 {
-	printf("%04X %04X  ", pc + SYSTEM_BASE_PC, op);
+	printf("%04X %04X  ", pc, op);
 	uint8_t nibble1 = op >> 12 & 0xF;
 	uint8_t nibble2 = op >> 8  & 0xF;
 	uint8_t nibble3 = op >> 4  & 0xF;
@@ -76,7 +76,7 @@ void dasm_dump(void)
 	
 	int i;
 	for (i=0; i<size; i++) {
-		dasm_op(i, rom[i]);
+		dasm_op(i + SYSTEM_BASE_PC, rom[i]);
 		printf("\n");
 	}
 }
