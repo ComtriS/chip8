@@ -83,6 +83,11 @@ uint16_t system_getSP(void)
 	return chip8.SP;
 }
 
+reg_t* system_getReg(uint8_t reg)
+{
+	return &chip8.V[reg];
+}
+
 ram_t* system_ram(void)
 {
 	return &chip8.ram;

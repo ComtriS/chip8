@@ -78,15 +78,25 @@ static int op_2XXX(word_t op)
 	pc = op & 0xFFF;
 	
 	system_setSP(sp);
-	system_setPC(sp);
+	system_setPC(pc);
 	return SUCCESS;
 }
 
 // 3XNN: Skips the next instruction if VX equals NN
 static int op_3XXX(word_t op)
 {
-	// inst_skip(v[n[2]] == b[0]);
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	int nn = (op >> 0) & 0xFF;
+	
+	uint16_t pc = system_getPC();
+	reg_t* reg  = system_getReg(x);
+	
+	if (*reg == nn)
+		pc += SYSTEM_INST_SIZE;
+	
+	pc += SYSTEM_INST_SIZE;
+	system_setPC(pc);
+	return SUCCESS;
 }
 
 // 4XNN: Skips the next instruction if VX doesn't equal NN
