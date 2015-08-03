@@ -3,8 +3,10 @@
 
 #include <stdint.h>
 
-#define SYSTEM_BASE_SP  0xFA0
-#define SYSTEM_BASE_PC  0x200
+#define SYSTEM_BASE_SP    0xFA0
+#define SYSTEM_BASE_PC    0x200
+
+#define SYSTEM_INST_SIZE  sizeof(word_t)
 
 #define REG_V0   regs.V[0x0]
 #define REG_V1   regs.V[0x1]
@@ -42,7 +44,7 @@ typedef union ram {
 
 typedef struct system {
 	reg_t     V[0x10];   // CHIP-8 has 16 8-bit data registers named from V0 to VF
-	uint16_t  I;      // The address register is used for memory operations
+	uint16_t  I;         // The address register is used for memory operations
 	uint16_t  SP;
 	uint16_t  PC;
 	uint8_t   delay_timer;
@@ -50,10 +52,14 @@ typedef struct system {
 	ram_t     ram;
 } system_t;
 
-void system_init(void);
-size_t system_getSize(void);
-uint16_t* system_getRom(void);
-uint16_t system_getPC(void);
-void system_setPC(uint16_t pc);
+void      system_init    (void);
+size_t    system_getSize (void);
+uint16_t* system_getRom  (void);
+uint16_t  system_getPC   (void);
+void      system_setPC   (uint16_t pc);
+void      system_setSP   (uint16_t sp);
+uint16_t  system_getSP   (void);
+reg_t*    system_getReg  (uint8_t reg);
+ram_t*    system_ram     (void);
 
 #endif /* __SYSTEM_H__ */

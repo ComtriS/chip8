@@ -73,6 +73,21 @@ uint16_t system_getPC(void)
 	return chip8.PC;
 }
 
+void system_setSP(uint16_t sp)
+{
+	chip8.SP = sp;
+}
+
+uint16_t system_getSP(void)
+{
+	return chip8.SP;
+}
+
+ram_t* system_ram(void)
+{
+	return &chip8.ram;
+}
+
 int system_destroy(void)
 {
 	free(rom_bin);

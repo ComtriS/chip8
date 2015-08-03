@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "system.h"
 #include "str.h"
 #include "op.h"
 
@@ -64,9 +65,21 @@ static int op_1XXX(word_t op)
 // 2NNN: Calls subroutine at NNN
 static int op_2XXX(word_t op)
 {
-	// uint16_t nnn = op & 0xFFF;
-	// subr_call(nnn);
-	return ERR_NOT_IMPLEMENTED;
+	uint16_t sp = system_getSP();
+	uint16_t pc = system_getPC();
+	ram_t* ram = system_ram();
+	
+	sp -= SYSTEM_INST_SIZE;
+	pc += SYSTEM_INST_SIZE;
+	
+	ram->bytes[sp-0] = pc >> 8;
+	ram->bytes[sp-1] = pc & 0xFF;
+	
+	pc = op & 0xFFF;
+	
+	system_setSP(sp);
+	system_setPC(sp);
+	return SUCCESS;
 }
 
 // 3XNN: Skips the next instruction if VX equals NN
