@@ -117,8 +117,13 @@ static int op_5XXX(word_t op)
 // 6XNN: Sets VX to NN
 static int op_6XXX(word_t op)
 {
-	// set(&v[n[2]], b[0]);
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	int nn = (op >> 0) & 0xFF;
+	
+	chip8.V[x] = nn;
+	
+	chip8.PC += SYSTEM_INST_SIZE;
+	return SUCCESS;
 }
 
 // 7XNN: Adds NN to VX
