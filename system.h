@@ -53,5 +53,7 @@ typedef struct system {
 void system_init(void);
 size_t system_getSize(void);
 uint16_t* system_getRom(void);
+uint16_t system_getPC(void);
+void system_setPC(uint16_t pc);
 
 #endif /* __SYSTEM_H__ */

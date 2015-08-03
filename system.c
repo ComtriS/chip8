@@ -63,6 +63,16 @@ uint16_t* system_getRom(void)
 	return rom_bin;
 }
 
+void system_setPC(uint16_t pc)
+{
+	chip8.PC = pc;
+}
+
+uint16_t system_getPC(void)
+{
+	return chip8.PC;
+}
+
 int system_destroy(void)
 {
 	free(rom_bin);

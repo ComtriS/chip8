@@ -57,9 +57,8 @@ static int op_0XXX(word_t op)
 // 1NNN: Jumps to address NNN
 static int op_1XXX(word_t op)
 {
-	// uint16_t nnn = op & 0xFFF;
-	// inst_jump(nnn);
-	return ERR_NOT_IMPLEMENTED;
+	system_setPC(op & 0xFFF);
+	return SUCCESS;
 }
 
 // 2NNN: Calls subroutine at NNN
