@@ -2,6 +2,7 @@
 #define __SYSTEM_H__
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define SYSTEM_BASE_SP    0xFA0
 #define SYSTEM_BASE_PC    0x200
@@ -45,5 +46,6 @@ size_t    system_getSize (void);
 uint16_t* system_getRom  (void);
 void      system_incPC   (void);
 void      system_decPC   (void);
+void      system_start   (bool debug);
 
 #endif /* __SYSTEM_H__ */

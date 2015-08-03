@@ -68,3 +68,15 @@ void dasm_op(uint16_t pc, uint16_t op)
 	
 	printf("**ERROR**");
 }
+
+void dasm_dump(void)
+{
+	uint16_t* rom = system_getRom();
+	size_t size   = system_getSize();
+	
+	int i;
+	for (i=0; i<size; i++) {
+		dasm_op(i, rom[i]);
+		printf("\n");
+	}
+}

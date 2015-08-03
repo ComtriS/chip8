@@ -5,6 +5,7 @@
 #include <endian.h>
 #include "system.h"
 #include "errors.h"
+#include "op.h"
 
 system_t chip8 = {0};
 uint16_t* rom_bin = NULL;
@@ -71,6 +72,19 @@ void system_incPC(void)
 void system_decPC(void)
 {
 	chip8.PC -= SYSTEM_INST_SIZE;
+}
+
+void system_start(bool debug)
+{
+	uint16_t* rom = system_getRom();
+	size_t size   = system_getSize();
+	
+	int i;
+	for (i=0; i<size; i++) {
+		dasm_op(i, rom[i]);
+		printf("\n");
+		op_do(rom[i]);
+	}
 }
 
 int system_destroy(void)
