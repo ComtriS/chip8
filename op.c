@@ -246,8 +246,31 @@ static int op_CXXX(word_t op)
 // 8bits wide. Wraps around the screen. If when drawn, clears a pixel, register
 // VF is set to 1 otherwise it is zero. All drawing is XOR drawing (i.e. it
 // toggles the screen pixels)
+//
+// Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a
+// height of N pixels. Each row of 8 pixels is read as bit-coded (with the most
+// significant bit of each byte displayed on the left) starting from memory
+// location I; I value doesn’t change after the execution of this instruction.
+// As described above, VF is set to 1 if any screen pixels are flipped from set
+// to unset when the sprite is drawn, and to 0 if that doesn’t happen.
 static int op_DXXX(word_t op)
 {
+	int x  = (op >> 8) & 0xF;
+	int y  = (op >> 4) & 0xF;
+	int n  = (op >> 0) & 0xF;
+	
+	uint8_t* sprite = &chip8.ram.bytes[chip8.I];
+	
+	REG_VF = 0;
+	
+	int i;
+	for (i=0; i<n; i++) {
+		uint8_t line = sprite[i];
+		bool unset = display_drawLine(chip8.V[x], chip8.V[y], line);
+		if (unset)
+			REG_VF = 1;
+	}
+	
 	return SUCCESS;
 }
 
