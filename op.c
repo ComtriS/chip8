@@ -281,8 +281,11 @@ static int op_FX0A(word_t op)
 // FX15: Sets the delay timer to VX
 static int op_FX15(word_t op)
 {
-	// return set(&time_delay, v[n[2]]); 
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	
+	chip8.delay_timer = chip8.V[x];
+	
+	return SUCCESS;
 }
 
 // FX18: Sets the sound timer to VX
