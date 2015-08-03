@@ -25,17 +25,25 @@ static const char* op_status(int status)
 }
 
 // 00E0: Clears the screen
-static int op_00E0()
+static int op_00E0(void)
 {
 	display_clear();
 	return SUCCESS;
 }
 
 // 00EE: Returns from a subroutine
-static int op_00EE()
+static int op_00EE(void)
 {
-	// subr_return();
-	return ERR_NOT_IMPLEMENTED;
+	// load stack pointer from stack
+	chip8.PC = chip8.ram.bytes[chip8.SP-0];
+	chip8.PC <<= 8;
+	chip8.PC |= chip8.ram.bytes[chip8.SP-1];
+	
+	// pop stack
+	chip8.SP += SYSTEM_INST_SIZE;
+	
+	system_decPC();    // to avoid later increment
+	return SUCCESS;
 }
 
 // 0NNN: Calls RCA 1802 program at address NNN
@@ -76,6 +84,7 @@ static int op_2XXX(word_t op)
 {
 	int nnn = (op >> 0) & 0xFFF;
 	
+	// push stack
 	chip8.SP -= SYSTEM_INST_SIZE;
 	chip8.PC += SYSTEM_INST_SIZE;
 	
