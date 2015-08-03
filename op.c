@@ -301,8 +301,11 @@ static int op_FX18(word_t op)
 // FX1E: Adds VX to I
 static int op_FX1E(word_t op)
 {
-	// return add(&reg_i, v[n[2]]);   
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	
+	chip8.V[x] = chip8.I;
+	
+	return SUCCESS;
 }
 
 #define FONT_BASE 0x0
