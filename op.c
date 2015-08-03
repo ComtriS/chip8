@@ -209,8 +209,12 @@ static int op_AXXX(word_t op)
 // BNNN: Jumps to the address NNN plus V0
 static int op_BXXX(word_t op)
 {
-	// inst_jump(nnn + v[0]);
-	return ERR_NOT_IMPLEMENTED;
+	int nnn = (op >> 0) & 0xFFF;
+	
+	chip8.PC = nnn + chip8.V[0];
+	
+	system_decPC();    // to avoid later increment
+	return SUCCESS;
 }
 
 // CXNN: Sets VX to a random number, masked by NN
