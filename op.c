@@ -11,7 +11,7 @@ static int op_error(word_t op)
 
 static void op_print(word_t op)
 {
-	printf("0x%04X\n", op);
+	printf("0x%04X", op);
 }
 
 static const char* op_status(int status)
@@ -318,5 +318,5 @@ void op_do(word_t op)
 {
 	int status = op_XXXX(op);
 	op_print(op);
-	printf("%s\n", op_status(status));
+	printf(" => %s\n", op_status(status));
 }
