@@ -58,27 +58,20 @@ static int op_0XXX(word_t op)
 // 1NNN: Jumps to address NNN
 static int op_1XXX(word_t op)
 {
-	system_setPC(op & 0xFFF);
+	chip8.PC = op & 0xFFF;
 	return SUCCESS;
 }
 
 // 2NNN: Calls subroutine at NNN
 static int op_2XXX(word_t op)
 {
-	uint16_t sp = system_getSP();
-	uint16_t pc = system_getPC();
-	ram_t* ram = system_ram();
+	chip8.SP -= SYSTEM_INST_SIZE;
+	chip8.PC += SYSTEM_INST_SIZE;
 	
-	sp -= SYSTEM_INST_SIZE;
-	pc += SYSTEM_INST_SIZE;
+	chip8.ram.bytes[chip8.SP-0] = chip8.PC >> 8;
+	chip8.ram.bytes[chip8.SP-1] = chip8.PC & 0xFF;
 	
-	ram->bytes[sp-0] = pc >> 8;
-	ram->bytes[sp-1] = pc & 0xFF;
-	
-	pc = op & 0xFFF;
-	
-	system_setSP(sp);
-	system_setPC(pc);
+	chip8.PC = op & 0xFFF;
 	return SUCCESS;
 }
 
@@ -88,14 +81,10 @@ static int op_3XXX(word_t op)
 	int x  = (op >> 8) & 0xF;
 	int nn = (op >> 0) & 0xFF;
 	
-	uint16_t pc = system_getPC();
-	reg_t* reg  = system_getReg(x);
+	if (chip8.V[x] == nn)
+		chip8.PC += SYSTEM_INST_SIZE;
 	
-	if (*reg == nn)
-		pc += SYSTEM_INST_SIZE;
-	
-	pc += SYSTEM_INST_SIZE;
-	system_setPC(pc);
+	chip8.PC += SYSTEM_INST_SIZE;
 	return SUCCESS;
 }
 

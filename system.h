@@ -37,14 +37,10 @@ typedef struct system {
 	ram_t     ram;
 } system_t;
 
+extern system_t chip8;
+
 void      system_init    (void);
 size_t    system_getSize (void);
 uint16_t* system_getRom  (void);
-uint16_t  system_getPC   (void);
-void      system_setPC   (uint16_t pc);
-void      system_setSP   (uint16_t sp);
-uint16_t  system_getSP   (void);
-reg_t*    system_getReg  (uint8_t reg);
-ram_t*    system_ram     (void);
 
 #endif /* __SYSTEM_H__ */

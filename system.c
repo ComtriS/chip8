@@ -63,36 +63,6 @@ uint16_t* system_getRom(void)
 	return rom_bin;
 }
 
-void system_setPC(uint16_t pc)
-{
-	chip8.PC = pc;
-}
-
-uint16_t system_getPC(void)
-{
-	return chip8.PC;
-}
-
-void system_setSP(uint16_t sp)
-{
-	chip8.SP = sp;
-}
-
-uint16_t system_getSP(void)
-{
-	return chip8.SP;
-}
-
-reg_t* system_getReg(uint8_t reg)
-{
-	return &chip8.V[reg];
-}
-
-ram_t* system_ram(void)
-{
-	return &chip8.ram;
-}
-
 int system_destroy(void)
 {
 	free(rom_bin);
