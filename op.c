@@ -180,8 +180,13 @@ static int op_8XXX(word_t op)
 // 9XY0: Skips the next instruction if VX doesn't equal VY
 static int op_9XXX(word_t op)
 {
-	// inst_skip(n[2], n[1]);
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	int y  = (op >> 4) & 0xF;
+	
+	if (chip8.V[x] != chip8.V[y])
+		system_incPC();
+	
+	return SUCCESS;
 }
 
 // ANNN: Sets I to the address NNN
