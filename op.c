@@ -291,8 +291,11 @@ static int op_FX15(word_t op)
 // FX18: Sets the sound timer to VX
 static int op_FX18(word_t op)
 {
-	// return set(&time_sound, v[n[2]]); 
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	
+	chip8.sound_timer = chip8.V[x];
+	
+	return SUCCESS;
 }
 
 // FX1E: Adds VX to I
