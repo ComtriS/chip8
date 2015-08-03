@@ -59,6 +59,7 @@ static int op_0XXX(word_t op)
 static int op_1XXX(word_t op)
 {
 	chip8.PC = op & 0xFFF;
+	system_decPC();    // to avoid later increment
 	return SUCCESS;
 }
 
@@ -72,6 +73,7 @@ static int op_2XXX(word_t op)
 	chip8.ram.bytes[chip8.SP-1] = chip8.PC & 0xFF;
 	
 	chip8.PC = op & 0xFFF;
+	system_decPC();    // to avoid later increment
 	return SUCCESS;
 }
 
@@ -82,9 +84,8 @@ static int op_3XXX(word_t op)
 	int nn = (op >> 0) & 0xFF;
 	
 	if (chip8.V[x] == nn)
-		chip8.PC += SYSTEM_INST_SIZE;
+		system_incPC();
 	
-	chip8.PC += SYSTEM_INST_SIZE;
 	return SUCCESS;
 }
 
@@ -95,9 +96,8 @@ static int op_4XXX(word_t op)
 	int nn = (op >> 0) & 0xFF;
 	
 	if (chip8.V[x] != nn)
-		chip8.PC += SYSTEM_INST_SIZE;
+		system_incPC();
 	
-	chip8.PC += SYSTEM_INST_SIZE;
 	return SUCCESS;
 }
 
@@ -108,9 +108,8 @@ static int op_5XXX(word_t op)
 	int y  = (op >> 4) & 0xF;
 	
 	if (chip8.V[x] == chip8.V[y])
-		chip8.PC += SYSTEM_INST_SIZE;
+		system_incPC();
 	
-	chip8.PC += SYSTEM_INST_SIZE;
 	return SUCCESS;
 }
 
@@ -122,7 +121,6 @@ static int op_6XXX(word_t op)
 	
 	chip8.V[x] = nn;
 	
-	chip8.PC += SYSTEM_INST_SIZE;
 	return SUCCESS;
 }
 
@@ -344,6 +342,7 @@ static int op_XXXX(word_t op)
 void op_do(word_t op)
 {
 	int status = op_XXXX(op);
+	system_incPC();
 	op_print(op);
 	printf(" => %s\n", op_status(status));
 }

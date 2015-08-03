@@ -10,7 +10,8 @@
 
 #define REG_VF   regs.V[0xF]  // The VF register doubles as a carry flag
 
-typedef uint8_t reg_t;
+typedef uint8_t  reg_t;
+typedef uint16_t word_t;
 
 // CHIP-8 has 4096 (0x1000) memory locations, each of which is 8 bits (a byte)
 // Bytes 0x000-0x1FF: originally reserved for interpreter; now used for font data
@@ -42,5 +43,7 @@ extern system_t chip8;
 void      system_init    (void);
 size_t    system_getSize (void);
 uint16_t* system_getRom  (void);
+void      system_incPC   (void);
+void      system_decPC   (void);
 
 #endif /* __SYSTEM_H__ */

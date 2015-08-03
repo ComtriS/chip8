@@ -63,6 +63,16 @@ uint16_t* system_getRom(void)
 	return rom_bin;
 }
 
+void system_incPC(void)
+{
+	chip8.PC += SYSTEM_INST_SIZE;
+}
+
+void system_decPC(void)
+{
+	chip8.PC -= SYSTEM_INST_SIZE;
+}
+
 int system_destroy(void)
 {
 	free(rom_bin);
