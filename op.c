@@ -91,8 +91,14 @@ static int op_3XXX(word_t op)
 // 4XNN: Skips the next instruction if VX doesn't equal NN
 static int op_4XXX(word_t op)
 {
-	// inst_skip(v[n[2]] != b[0]);
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	int nn = (op >> 0) & 0xFF;
+	
+	if (chip8.V[x] != nn)
+		chip8.PC += SYSTEM_INST_SIZE;
+	
+	chip8.PC += SYSTEM_INST_SIZE;
+	return SUCCESS;
 }
 
 // 5XY0: Skips the next instruction if VX equals VY
