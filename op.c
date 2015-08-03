@@ -1,18 +1,7 @@
 #include <stdio.h>
+#include "system.h"
 #include "str.h"
 #include "op.h"
-
-// CHIP-8 has 16 8-bit data registers named from V0 to VF.
-reg_t v[0x10] = {0};
-
-// The VF register doubles as a carry flag.
-#define VF v[0xF]
-
-// The address register, which is named I, is 16 bits wide and is used with several opcodes that involve memory operations.
-word_t reg_i = 0;
-
-word_t time_delay = 0;
-word_t time_sound = 0;
 
 static int op_error(word_t op)
 {
@@ -303,9 +292,9 @@ static int op_FXXX(word_t op)
 // XXXX: Handles an instruction
 static int op_XXXX(word_t op)
 {
-	nibble_t n  = op >> 12;
+	uint8_t top_nibble = op >> 12;
 	
-	switch (n) {
+	switch (top_nibble) {
 		case 0x0: return op_0XXX(op);
 		case 0x1: return op_1XXX(op); 
 		case 0x2: return op_2XXX(op); 
