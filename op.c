@@ -264,8 +264,11 @@ static int op_EXXX(word_t op)
 // FX07: Sets VX to the value of the delay timer
 static int op_FX07(word_t op)
 {
-	// return set(&v[n[2]], time_delay); 
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	
+	chip8.V[x] = chip8.delay_timer;
+	
+	return SUCCESS;
 }
 
 // FX0A: A key press is awaited, and then stored in VX
