@@ -138,36 +138,43 @@ static int op_7XXX(word_t op)
 // 8XYZ: Performs ALU instruction Z on VX and VY
 static int op_8XXX(word_t op)
 {
-	/*
-	switch (op) {
+	int x  = (op >> 8) & 0xF;
+	int y  = (op >> 4) & 0xF;
+	int z  = (op >> 0) & 0xF;
+	
+	reg_t* v = chip8.V;
+	
+	switch (z) {
 		case 0x0: v[x]  = v[y]; return; // 8XY0	Sets VX to the value of VY.
 		case 0x1: v[x] |= v[y]; return; // 8XY1	Sets VX to VX or VY.
 		case 0x2: v[x] &= v[y]; return; // 8XY2	Sets VX to VX and VY.
 		case 0x3: v[x] ^= v[y]; return; // 8XY3	Sets VX to VX xor VY.
 		
 		case 0x4:   // 8XY4	Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
-			VF = (v[x] > 0xFF - v[y]) ? 1 : 0;
+			REG_VF = (v[x] > 0xFF - v[y]) ? 1 : 0;   // TODO: magic number
 			v[x] += v[y];
-			return;
+			break;
 		case 0x5:   // 8XY5	VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
-			VF = (v[x] < v[y]) ? 1 : 0;
+			REG_VF = (v[x] < v[y]) ? 1 : 0;
 			v[x] -= v[y];
-			return;
+			break;
 		case 0x6:   // 8XY6	Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift.
-			VF = v[x] & 0x1;
+			REG_VF = v[x] & 0x1;
 			v[x] >>= 1;
-			return;
+			break;
 		case 0x7:   // 8XY7	Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
-			VF = (v[y] < v[x]) ? 1 : 0;
+			REG_VF = (v[y] < v[x]) ? 1 : 0;
 			v[x] = v[y] - v[x];
-			return;
+			break;
 		case 0xE:   // 8XYE	Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
-			VF = v[x] >> 7;
+			REG_VF = v[x] >> 7;   // TODO: magic number
 			v[x] <<= 1;
-			return;
+			break;
+		default:
+			return ERR_NOT_IMPLEMENTED;
 	}
-	*/
-	return ERR_NOT_IMPLEMENTED;
+	
+	return SUCCESS;
 }
 
 // 9XY0: Skips the next instruction if VX doesn't equal VY

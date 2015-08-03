@@ -8,7 +8,7 @@
 
 #define SYSTEM_INST_SIZE  sizeof(word_t)
 
-#define REG_VF   regs.V[0xF]  // The VF register doubles as a carry flag
+#define REG_VF   chip8.V[0xF]  // The VF register doubles as a carry flag
 
 typedef uint8_t  reg_t;
 typedef uint16_t word_t;
