@@ -345,15 +345,15 @@ static int op_FX1E(word_t op)
 	return SUCCESS;
 }
 
-#define FONT_BASE 0x0
-
 // FX29: Sets I to the location of the sprite for the character in VX.
 // Characters 0-F (in hexadecimal) are represented by a 4x5 font
 static int op_FX29(word_t op)
 {
-	// int reg = op & 0x0F00 >> 8;
-	// reg_i = FONT_BASE + (v[reg] * 5);
-	return ERR_NOT_IMPLEMENTED;                     
+	int x  = (op >> 8) & 0xF;
+	
+	chip8.I = 0 + 5 * chip8.V[x]; // TODO: 0 is a magic number (FONT_BASE)
+	
+	return SUCCESS;
 }
 
 // FX33: Stores the Binary-coded decimal representation of VX, with the most
