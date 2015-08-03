@@ -199,8 +199,11 @@ static int op_9XXX(word_t op)
 // ANNN: Sets I to the address NNN
 static int op_AXXX(word_t op)
 {
-	// set(&reg_i, nnn);
-	return ERR_NOT_IMPLEMENTED;
+	int nnn = (op >> 0) & 0xFFF;
+	
+	chip8.I = nnn;
+	
+	return SUCCESS;
 }
 
 // BNNN: Jumps to the address NNN plus V0
