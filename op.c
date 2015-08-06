@@ -292,7 +292,7 @@ static int op_DXXX(word_t op)
 		uint8_t line = sprite[i];
 		//printf("%d] SPRITE %d: drawing 0x%02X [0x%04X] at %d,%d\n", count++, n+1, line, chip8.I+i, chip8.V[x], chip8.V[y]);
 		//getchar();
-		bool unset = display_drawLine(chip8.V[x], chip8.V[y], line);
+		bool unset = display_drawLine(chip8.V[x], chip8.V[y]+i, line);
 		if (unset)
 			REG_VF = 1;
 	}
