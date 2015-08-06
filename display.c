@@ -132,7 +132,7 @@ void display_toggle(int x, int y)
 	if (!display_inited)
 		return;
 	
-	display_screen[x][y] = !display_screen[x][y];
+	display_screen[x][y] ^= 1;
 	display_update(x, y);
 }
 
