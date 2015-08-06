@@ -2,6 +2,31 @@
 #include "system.h"
 #include "str.h"
 #include "op.h"
+#include "display.h"
+#include "debug.h"
+
+void stack_push(uint16_t data)
+{
+	// push stack
+	chip8.SP -= SYSTEM_INST_SIZE;
+	
+	// save on stack
+	chip8.ram.bytes[chip8.SP+0] = data >> 8;
+	chip8.ram.bytes[chip8.SP+1] = data & 0xFF;
+}
+
+uint16_t stack_pop(void)
+{
+	// load from stack
+	uint16_t data = chip8.ram.bytes[chip8.SP+0];
+	data <<= 8;
+	data |= chip8.ram.bytes[chip8.SP+1];
+	
+	// pop stack
+	chip8.SP += SYSTEM_INST_SIZE;
+	
+	return data;
+}
 
 static int op_error(word_t op)
 {
@@ -22,6 +47,9 @@ const char* op_status(int status)
 		case ERR_NOT_IMPLEMENTED: return STR(ERR_NOT_IMPLEMENTED);
 		case SUCCESS:             return STR(SUCCESS);
 	}
+	static char buf[256];
+	sprintf(buf, "%d", status);
+	return buf;
 }
 
 // 00E0: Clears the screen
@@ -34,15 +62,11 @@ static int op_00E0(void)
 // 00EE: Returns from a subroutine
 static int op_00EE(void)
 {
-	// load stack pointer from stack
-	chip8.PC = chip8.ram.bytes[chip8.SP-0];
-	chip8.PC <<= 8;
-	chip8.PC |= chip8.ram.bytes[chip8.SP-1];
+	// load PC from stack
+	chip8.PC = stack_pop();
 	
-	// pop stack
-	chip8.SP += SYSTEM_INST_SIZE;
-	
-	system_decPC();    // to avoid later increment
+	// to avoid later increment
+	system_decPC();
 	return SUCCESS;
 }
 
@@ -84,17 +108,15 @@ static int op_2XXX(word_t op)
 {
 	int nnn = (op >> 0) & 0xFFF;
 	
-	// push stack
-	chip8.SP -= SYSTEM_INST_SIZE;
-	chip8.PC += SYSTEM_INST_SIZE;
+	// save next PC on stack
+	system_incPC();
+	stack_push(chip8.PC);
 	
-	// save stack pointer on stack
-	chip8.ram.bytes[chip8.SP-0] = chip8.PC >> 8;
-	chip8.ram.bytes[chip8.SP-1] = chip8.PC & 0xFF;
-	
+	// set PC to subroutine
 	chip8.PC = nnn;
 	
-	system_decPC();    // to avoid later increment
+	// to avoid later increment
+	system_decPC();
 	return SUCCESS;
 }
 
@@ -263,9 +285,13 @@ static int op_DXXX(word_t op)
 	
 	REG_VF = 0;
 	
+	static count = 0;
+	
 	int i;
 	for (i=0; i<n; i++) {
 		uint8_t line = sprite[i];
+		//printf("%d] SPRITE %d: drawing 0x%02X [0x%04X] at %d,%d\n", count++, n+1, line, chip8.I+i, chip8.V[x], chip8.V[y]);
+		//getchar();
 		bool unset = display_drawLine(chip8.V[x], chip8.V[y], line);
 		if (unset)
 			REG_VF = 1;
@@ -420,21 +446,21 @@ static int op_XXXX(word_t op)
 	
 	switch (top_nibble) {
 		case 0x0: return op_0XXX(op);
-		case 0x1: return op_1XXX(op); 
-		case 0x2: return op_2XXX(op); 
-		case 0x3: return op_3XXX(op); 
-		case 0x4: return op_4XXX(op); 
-		case 0x5: return op_5XXX(op); 
-		case 0x6: return op_6XXX(op); 
-		case 0x7: return op_7XXX(op); 
-		case 0x8: return op_8XXX(op); 
-		case 0x9: return op_9XXX(op); 
-		case 0xA: return op_AXXX(op); 
-		case 0xB: return op_BXXX(op); 
-		case 0xC: return op_CXXX(op); 
-		case 0xD: return op_DXXX(op); 
-		case 0xE: return op_EXXX(op); 
-		case 0xF: return op_FXXX(op); 
+		case 0x1: return op_1XXX(op);
+		case 0x2: return op_2XXX(op);
+		case 0x3: return op_3XXX(op);
+		case 0x4: return op_4XXX(op);
+		case 0x5: return op_5XXX(op);
+		case 0x6: return op_6XXX(op);
+		case 0x7: return op_7XXX(op);
+		case 0x8: return op_8XXX(op);
+		case 0x9: return op_9XXX(op);
+		case 0xA: return op_AXXX(op);
+		case 0xB: return op_BXXX(op);
+		case 0xC: return op_CXXX(op);
+		case 0xD: return op_DXXX(op);
+		case 0xE: return op_EXXX(op);
+		case 0xF: return op_FXXX(op);
 	}
 }
 
