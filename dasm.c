@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "system.h"
+#include "display.h"
+#include "debug.h"
 
 void dasm_op(uint16_t pc, uint16_t op)
 {

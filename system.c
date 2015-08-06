@@ -7,6 +7,8 @@
 #include "system.h"
 #include "errors.h"
 #include "op.h"
+#include "display.h"
+#include "debug.h"
 
 system_t chip8 = {0};
 uint16_t* rom_bin = NULL;
@@ -80,9 +82,9 @@ void system_decPC(void)
 	chip8.PC -= SYSTEM_INST_SIZE;
 }
 
-void system_start(bool debug)
+void system_start(bool debug, bool step)
 {
-	if (!debug)
+	//if (!debug)
 		display_init();
 	
 	uint16_t* rom = system_getRom();
@@ -94,18 +96,20 @@ void system_start(bool debug)
 		word_t op = *(word_t*)&chip8.ram.bytes[chip8.PC];
 		
 		if (debug) {
+			printf("%5d] ", count++);
 			dasm_op(chip8.PC, op);
 			printf("\n");
-			printf("%5d] ", count++);
-			op_print(op);
 		}
 		
 		status = op_do(op);
-		
-		if (debug)
-			printf(" => %s\n", op_status(status));
-		
+		if (step) {
+			display_saveCursor();
+			getchar();
+			display_loadCursor();
+		}
 	} while (status == SUCCESS);
+	
+	printf("ERROR: %s\n", op_status(status));
 }
 
 void system_halt(void)
