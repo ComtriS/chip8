@@ -1,6 +1,5 @@
 #include <string.h>
 #include <stdio.h>
-#include "display.h"
 #include "font.h"
 #include "system.h"
 
@@ -34,6 +33,16 @@ void display_gotoxy(int x, int y)
 		return;
 	
 	printf("%c[%d;%df", DISPLAY_ESC, y+2, x+2);
+}
+
+void display_saveCursor(void)
+{
+	printf("%c7", DISPLAY_ESC);
+}
+
+void display_loadCursor(void)
+{
+	printf("%c8", DISPLAY_ESC);
 }
 
 void display_drawBox(int x1, int x2, int y1, int y2)
@@ -161,5 +170,6 @@ bool display_drawLine(int x, int y, uint8_t line)
 		x++;
 		line >>= 1;
 	}
+	
 	return unset;
 }
