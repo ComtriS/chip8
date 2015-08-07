@@ -99,8 +99,6 @@ void display_clear(void)
 	if (!display_inited)
 		return;
 	
-	printf("%c[2J", DISPLAY_ESC);
-	printf("%c[1;1H", DISPLAY_ESC);
 	memset(display_screen, 0, sizeof(display_screen));
 	display_drawBox(0, DISPLAY_MAX_X+1, 0, DISPLAY_MAX_Y+1);
 	fflush(stdout);
