@@ -24,7 +24,7 @@
 #define DISPLAY_DL   "%c%c%c", 0xe2, 0x94, 0x97
 #define DISPLAY_DR   "%c%c%c", 0xe2, 0x94, 0x9b
 
-bool display_screen[DISPLAY_MAX_X][DISPLAY_MAX_Y] = {0};
+bool display_screen[DISPLAY_MAX_X][DISPLAY_MAX_Y] = {{0}};
 bool display_inited = false;
 
 void display_gotoxy(int x, int y)

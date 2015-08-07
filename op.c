@@ -4,6 +4,7 @@
 #include "op.h"
 #include "display.h"
 #include "debug.h"
+#include "random.h"
 
 void stack_push(uint16_t data)
 {
@@ -188,10 +189,10 @@ static int op_8XXX(word_t op)
 	reg_t* v = chip8.V;
 	
 	switch (z) {
-		case 0x0: v[x]  = v[y]; return; // 8XY0	Sets VX to the value of VY.
-		case 0x1: v[x] |= v[y]; return; // 8XY1	Sets VX to VX or VY.
-		case 0x2: v[x] &= v[y]; return; // 8XY2	Sets VX to VX and VY.
-		case 0x3: v[x] ^= v[y]; return; // 8XY3	Sets VX to VX xor VY.
+		case 0x0: v[x]  = v[y]; break; // 8XY0	Sets VX to the value of VY.
+		case 0x1: v[x] |= v[y]; break; // 8XY1	Sets VX to VX or VY.
+		case 0x2: v[x] &= v[y]; break; // 8XY2	Sets VX to VX and VY.
+		case 0x3: v[x] ^= v[y]; break; // 8XY3	Sets VX to VX xor VY.
 		
 		case 0x4:   // 8XY4	Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
 			REG_VF = (v[x] > 0xFF - v[y]) ? 1 : 0;   // TODO: magic number
@@ -285,7 +286,7 @@ static int op_DXXX(word_t op)
 	
 	REG_VF = 0;
 	
-	static count = 0;
+	//static int count = 0;
 	
 	int i;
 	for (i=0; i<n; i++) {
@@ -462,6 +463,8 @@ static int op_XXXX(word_t op)
 		case 0xE: return op_EXXX(op);
 		case 0xF: return op_FXXX(op);
 	}
+	
+	return OP_ERR_BAD_INST;
 }
 
 int op_do(word_t op)

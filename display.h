@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+void display_init(void);
 void display_gotoxy(int x, int y);
 void display_clear(void);
 void display_set(int x, int y, bool value);

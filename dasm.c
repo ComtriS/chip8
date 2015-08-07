@@ -11,7 +11,7 @@ void dasm_op(uint16_t pc, uint16_t op)
 	uint8_t nibble2 = op >> 8  & 0xF;
 	uint8_t nibble3 = op >> 4  & 0xF;
 	uint8_t nibble4 = op >> 0  & 0xF;
-	uint8_t byte1   = op >> 8  & 0xFF;
+	//uint8_t byte1   = op >> 8  & 0xFF;
 	uint8_t byte2   = op >> 0  & 0xFF;
 	uint16_t nnn    = op & 0xFFF;
 	

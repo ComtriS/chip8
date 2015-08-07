@@ -9,8 +9,9 @@
 #include "op.h"
 #include "display.h"
 #include "debug.h"
+#include "dasm.h"
 
-system_t chip8 = {0};
+system_t chip8 = {{0}};
 uint16_t* rom_bin = NULL;
 size_t rom_size;
 
@@ -24,7 +25,7 @@ size_t file_getSize(FILE* f)
 	return fsize;
 }
 
-int file_load(FILE* f, void* buf, size_t size)
+void file_load(FILE* f, void* buf, size_t size)
 {
 	fread(buf, 1, size, f);
 }
@@ -53,6 +54,7 @@ int system_load(const char* rom)
 	rom_size = file_size / BYTES_PER_PC;
 	
 	memcpy(chip8.ram.program, rom_bin, file_size);
+	return SUCCESS;
 }
 
 size_t system_getSize(void)
@@ -77,11 +79,7 @@ void system_decPC(void)
 
 void system_start(bool debug, bool step)
 {
-	//if (!debug)
-		display_init();
-	
-	uint16_t* rom = system_getRom();
-	size_t size   = system_getSize();
+	display_init();
 	
 	int count = 0;
 	int status;
@@ -110,7 +108,7 @@ void system_halt(void)
 	exit(1);
 }
 
-int system_destroy(void)
+void system_destroy(void)
 {
 	free(rom_bin);
 	rom_bin = NULL;

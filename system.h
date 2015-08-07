@@ -47,6 +47,7 @@ uint16_t* system_getRom  (void);
 void      system_incPC   (void);
 void      system_decPC   (void);
 void      system_start   (bool debug, bool step);
+int       system_load    (const char* rom);
 void      system_halt    (void);
 
 #endif /* __SYSTEM_H__ */

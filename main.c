@@ -41,7 +41,8 @@ int main(int argc, char** argv)
 	}
 	
 	system_init();
-	system_load(file);
+	if (system_load(file) != SUCCESS)
+		return ERR_GENERIC;
 	
 	if (dasm) {
 		dasm_dump();
