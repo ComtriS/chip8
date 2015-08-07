@@ -9,7 +9,7 @@ ROMDIR=roms
 
 SRCS=$(wildcard *.c)
 OBJS=$(patsubst %,$(OBJDIR)/%,$(patsubst %.c,%.o,${SRCS}))
-LIBS=
+LIBS=-lpthread
 ARGS=
 ifeq ($(DEBUG),1)
 	ARGS+=-D

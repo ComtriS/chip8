@@ -37,6 +37,7 @@ typedef struct system {
 	uint8_t   delay_timer;
 	uint8_t   sound_timer;
 	ram_t     ram;
+	bool      keys[0x10];
 } system_t;
 
 extern system_t chip8;

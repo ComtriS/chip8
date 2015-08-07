@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include "system.h"
+#include "errors.h"
 
 // special stuff:
 #include <stdio.h>
@@ -10,16 +12,8 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
-int kbhit(void)
-{
-	fd_set rdfs;
-	FD_ZERO(&rdfs);
-	FD_SET(STDIN_FILENO, &rdfs);
- 	
-	struct timeval tv = {0};
-	select(STDIN_FILENO+1, &rdfs, NULL, NULL, &tv);
-	return FD_ISSET(STDIN_FILENO, &rdfs);
-}
+// special stuff:
+#include <pthread.h>
 
 void key_mode(int dir)
 {
@@ -37,23 +31,11 @@ void key_mode(int dir)
 	}
 }
 
-void key_test(void)
-{
-	key_mode(1);
-	
-	while (!kbhit())
-		putchar('.');
-	printf("%s: %c\n", __func__, getchar());
- 	
-	key_mode(0);
-}
-
 bool key_pressed(uint8_t key)
 {
-	if (kbhit()) {
-		char c = getchar();
-		if (key == strtol((char[]){c, 0}, NULL, 16))
-			return true;
+	if (chip8.keys[key]) {
+		chip8.keys[key] = false;
+		return true;
 	}
 	return false;
 }
@@ -67,4 +49,36 @@ uint8_t key_get(void)
 		if (key >= 0x0 && key <= 0xF)
 			return key;
 	}
+}
+
+void* key_thread(void* arg)
+{
+	while (1) {
+		uint8_t key = key_get();
+		chip8.keys[key] = 1;
+	}
+}
+
+void key_clear(void)
+{
+	memset(chip8.keys, 0, sizeof(chip8.keys));
+}
+
+int key_init(void)
+{
+	key_clear();
+	key_mode(1);
+	
+	pthread_t thread;
+	if (pthread_create(&thread, NULL, key_thread, NULL)) {
+		fprintf(stderr, "ERROR: couldn't create thread\n");
+		return ERR_GENERIC;
+	}
+	
+	return SUCCESS;
+}
+
+void key_deinit(void)
+{
+	key_mode(0);
 }

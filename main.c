@@ -45,6 +45,7 @@ int main(int argc, char** argv)
 	}
 	
 	system_init();
+	key_init();
 	
 	if (system_load(file) != SUCCESS)
 		return ERR_GENERIC;
@@ -54,8 +55,7 @@ int main(int argc, char** argv)
 		return SUCCESS;
 	}
 	
-	key_mode(1);
 	system_start(debug, step);
-	key_mode(0);
+	key_deinit();
 	return SUCCESS;
 }
