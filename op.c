@@ -316,8 +316,12 @@ static int op_EX9E(word_t op)
 // EXA1: Skips the next instruction if the key stored in VX isn't pressed
 static int op_EXA1(word_t op)
 {
-	// return inst_skip(key_isOff(v[x]));
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	
+	if (!key_pressed(chip8.V[x]))
+		system_incPC();
+	
+	return SUCCESS;
 }
 
 // EXXX: Handles instructions that start with 'E'
