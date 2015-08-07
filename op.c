@@ -379,7 +379,7 @@ static int op_FX1E(word_t op)
 {
 	int x  = (op >> 8) & 0xF;
 	
-	chip8.V[x] = chip8.I;
+	chip8.I += chip8.V[x];
 	
 	return SUCCESS;
 }
