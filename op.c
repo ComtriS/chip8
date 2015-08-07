@@ -5,6 +5,7 @@
 #include "display.h"
 #include "debug.h"
 #include "random.h"
+#include "key.h"
 
 void stack_push(uint16_t data)
 {
@@ -304,8 +305,12 @@ static int op_DXXX(word_t op)
 // EX9E: Skips the next instruction if the key stored in VX is pressed
 static int op_EX9E(word_t op)
 {
-	// return inst_skip(key_isOn(v[x]));
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	
+	if (key_pressed(chip8.V[x]))
+		system_incPC();
+	
+	return SUCCESS;
 }
 
 // EXA1: Skips the next instruction if the key stored in VX isn't pressed
