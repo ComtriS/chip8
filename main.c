@@ -7,6 +7,10 @@
 #include "op.h"
 #include "dasm.h"
 #include "system.h"
+#include "key.h"
+
+#include <termios.h>
+#include <unistd.h>
 
 int print_usage(const char* command)
 {
@@ -50,6 +54,8 @@ int main(int argc, char** argv)
 		return SUCCESS;
 	}
 	
+	key_mode(1);
 	system_start(debug, step);
+	key_mode(0);
 	return SUCCESS;
 }

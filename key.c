@@ -26,11 +26,13 @@ void key_mode(int dir)
 	static struct termios oldt, newt;
  	
 	if (dir == 1) {
+		//system("/bin/stty raw");
 		tcgetattr(STDIN_FILENO, &oldt);
 		newt = oldt;
 		newt.c_lflag &= ~( ICANON | ECHO );
 		tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 	} else {
+		//system("/bin/stty cooked");
 		tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 	}
 }
