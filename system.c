@@ -10,6 +10,7 @@
 #include "display.h"
 #include "debug.h"
 #include "dasm.h"
+#include "clock.h"
 
 system_t chip8 = {{0}};
 uint16_t* rom_bin = NULL;
@@ -77,26 +78,41 @@ void system_decPC(void)
 	chip8.PC -= SYSTEM_INST_SIZE;
 }
 
+#define TICKS_PER_INST  (CLOCKS_PER_SEC / 60.0f)
+
 void system_start(bool debug, bool step)
 {
 	display_init();
 	
-	int count = 0;
-	int status;
+	clock_t start_time = clock_time();
+	int total_inst = 0;
+	int status = SUCCESS;
 	do {
-		word_t op = be16toh(*(word_t*)&chip8.ram.bytes[chip8.PC]);
+		clock_t expected_time = start_time + (total_inst * TICKS_PER_INST);
+		clock_t diff_time = (clock_time() - expected_time);
+		if (diff_time < TICKS_PER_INST)
+			continue;
 		
-		if (debug) {
-			printf("%5d] ", count++);
-			dasm_op(chip8.PC, op);
-			printf("\n");
-		}
+		int inst_count = diff_time / TICKS_PER_INST;
 		
-		status = op_do(op);
-		if (step) {
-			display_saveCursor();
-			getchar();
-			display_loadCursor();
+		while (inst_count--) {
+			word_t op = be16toh(*(word_t*)&chip8.ram.bytes[chip8.PC]);
+			
+			if (debug) {
+				printf("%5d] ", total_inst);
+				dasm_op(chip8.PC, op);
+				printf("\n");
+			}
+			
+			status = op_do(op);
+			
+			if (step) {
+				display_saveCursor();
+				getchar();
+				display_loadCursor();
+			}
+			
+			total_inst++;
 		}
 	} while (status == SUCCESS);
 	
