@@ -486,5 +486,15 @@ int op_do(word_t op)
 {
 	int status = op_XXXX(op);
 	system_incPC();
+	
+	if (chip8.delay_timer > 0)
+		chip8.delay_timer--;
+	
+	if (chip8.sound_timer > 0) {
+		chip8.sound_timer--;
+		if (chip8.sound_timer == 0)
+			printf("\a");
+	}
+	
 	return status;
 }
