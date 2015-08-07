@@ -1,7 +1,7 @@
 .PHONY: all run clean
 
 CC=gcc
-CFLAGS=-Wall -Werror
+CFLAGS=-Wall -Werror -g
 
 BINDIR=bin
 OBJDIR=obj
