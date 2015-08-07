@@ -56,7 +56,7 @@ bool key_pressed(uint8_t key)
 	return false;
 }
 
-uint8_t key_wait(void)
+uint8_t key_get(void)
 {
 	while (1) {
 		char c = getchar();

@@ -347,8 +347,11 @@ static int op_FX07(word_t op)
 // FX0A: A key press is awaited, and then stored in VX
 static int op_FX0A(word_t op)
 {
-	// return key_get(&v[n[2]]);         
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	
+	chip8.V[x] = key_get();
+	
+	return SUCCESS;
 }
 
 // FX15: Sets the delay timer to VX
