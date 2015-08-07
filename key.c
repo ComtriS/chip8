@@ -40,22 +40,33 @@ bool key_pressed(uint8_t key)
 	return false;
 }
 
+bool key_waiting = false;
+uint8_t key_received;
+
 uint8_t key_get(void)
 {
+	key_waiting = true;
 	while (1) {
-		char c = getchar();
-		uint8_t key = strtol((char[]){c, 0}, NULL, 16);
-		
-		if (key >= 0x0 && key <= 0xF)
-			return key;
+		usleep(100000);
+		if (!key_waiting)
+			return key_received;
 	}
 }
 
 void* key_thread(void* arg)
 {
 	while (1) {
-		uint8_t key = key_get();
+		char c = getchar();
+		uint8_t key = strtol((char[]){c, 0}, NULL, 16);
+		
+		if (key < 0x0 || key > 0xF)
+			continue;
+		
 		chip8.keys[key] = 1;
+		if (key_waiting) {
+			key_received = key;
+			key_waiting = false;
+		}
 	}
 }
 
