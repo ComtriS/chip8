@@ -395,14 +395,17 @@ static int op_FX29(word_t op)
 	return SUCCESS;
 }
 
-// FX33: Stores the Binary-coded decimal representation of VX, with the most
-// significant of three digits at the address in I, the middle digit at I plus
-// 1, and the least significant digit at I plus 2. (In other words, take the
-// decimal representation of VX, place the hundreds digit in memory at location
-// in I, the tens digit at location I+1, and the ones digit at location I+2
+// FX33: Stores the hundreds digit of VX in memory at location I,
+// the tens digit at location I+1, the ones digit at location I+2
 static int op_FX33(word_t op)
 {
-	return ERR_NOT_IMPLEMENTED;
+	int x  = (op >> 8) & 0xF;
+	
+	chip8.ram.bytes[chip8.I+0] = (chip8.V[x] / 100) % 10;
+	chip8.ram.bytes[chip8.I+1] = (chip8.V[x] / 10)  % 10;
+	chip8.ram.bytes[chip8.I+2] = (chip8.V[x] / 1)   % 10;
+	
+	return SUCCESS;
 }
 
 // FX55: Stores V0 to VX in memory starting at address I
