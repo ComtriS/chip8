@@ -13,9 +13,13 @@ bool debug_inited = false;
 
 char debug_buffer[DEBUG_X_MAX * DEBUG_Y_MAX];
 int debug_idx = 0;
+bool debug_enabled = false;
 
 void debug_start(void)
 {
+	if (!debug_enabled)
+		return;
+	
 	if (!debug_inited) {
 		display_gotoxy(DEBUG_X_MIN, DEBUG_Y_MIN);
 		debug_inited = true;
@@ -32,6 +36,12 @@ int str_count(char* str, char c)
 
 void debug_end(void)
 {
+	if (!debug_enabled) {
+		printf("%s", debug_buffer);
+		debug_idx = 0;
+		return;
+	}
+	
 	int count = str_count(debug_buffer, '\n');
 	if (count > DEBUG_Y_SIZE) {
 		char* next_line = strchr(debug_buffer, '\n') + 1;

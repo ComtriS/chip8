@@ -41,6 +41,7 @@ int main(int argc, char** argv)
 	}
 	
 	system_init();
+	
 	if (system_load(file) != SUCCESS)
 		return ERR_GENERIC;
 	

@@ -6,6 +6,7 @@ void debug_end(void);
 
 extern char debug_buffer[];
 extern int debug_idx;
+extern bool debug_enabled;
 
 #define printf(...)                                                  \
 	do {                                                             \

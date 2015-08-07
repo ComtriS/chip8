@@ -82,6 +82,8 @@ void system_decPC(void)
 
 void system_start(bool debug, bool step)
 {
+	debug_enabled = debug || step;
+	
 	display_init();
 	
 	clock_t start_time = clock_time();
