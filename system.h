@@ -3,13 +3,15 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define SYSTEM_BASE_SP    0xFA0
 #define SYSTEM_BASE_PC    0x200
 
 #define SYSTEM_INST_SIZE  sizeof(word_t)
 
-#define REG_VF   chip8.V[0xF]  // The VF register doubles as a carry flag
+// The VF register doubles as a carry flag
+#define REG_VF   chip8.V[0xF]
 
 typedef uint8_t  reg_t;
 typedef uint16_t word_t;
@@ -42,7 +44,7 @@ typedef struct system {
 
 extern system_t chip8;
 
-void      system_init    (void);
+int       system_init    (void);
 size_t    system_getSize (void);
 uint16_t* system_getRom  (void);
 void      system_incPC   (void);
@@ -50,5 +52,6 @@ void      system_decPC   (void);
 void      system_start   (bool debug, bool step);
 int       system_load    (const char* rom);
 void      system_halt    (void);
+void      system_destroy (void);
 
 #endif /* __SYSTEM_H__ */

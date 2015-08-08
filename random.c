@@ -11,11 +11,9 @@ void random_init(void)
 	random_inited = true;
 }
 
-uint8_t random_u8(void)
+uint8_t random_byte(void)
 {
 	if (!random_inited)
 		random_init();
-	
-	// TODO: improve distribution
 	return (uint8_t)rand();
 }

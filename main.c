@@ -1,16 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <endian.h>
-#include "errors.h"
 #include "op.h"
-#include "dasm.h"
-#include "system.h"
-#include "key.h"
-
-#include <termios.h>
-#include <unistd.h>
 
 int print_usage(const char* command)
 {
@@ -44,18 +33,17 @@ int main(int argc, char** argv)
 		}
 	}
 	
-	system_init();
-	key_init();
+	if (system_init() != SUCCESS)
+		return ERR_GENERIC;
 	
 	if (system_load(file) != SUCCESS)
 		return ERR_GENERIC;
 	
 	if (dasm) {
-		dasm_dump();
+		op_dump();
 		return SUCCESS;
 	}
 	
 	system_start(debug, step);
-	key_deinit();
 	return SUCCESS;
 }

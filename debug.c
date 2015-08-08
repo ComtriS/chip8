@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "display.h"
+#include "str.h"
+#include "op.h"
 
 #define DEBUG_X_MIN   -1
 #define DEBUG_X_MAX   (DEBUG_X_MIN + 88)
@@ -9,11 +11,25 @@
 #define DEBUG_Y_MAX   (DEBUG_Y_MIN + 10)
 #define DEBUG_Y_SIZE  (DEBUG_Y_MAX - DEBUG_Y_MIN)
 
-bool debug_inited = false;
+bool debug_inited  = false;
+bool debug_enabled = false;
+int debug_idx      = 0;
 
 char debug_buffer[DEBUG_X_MAX * DEBUG_Y_MAX];
-int debug_idx = 0;
-bool debug_enabled = false;
+
+void debug_op(int num, uint8_t pc, uint8_t op)
+{
+	printf("%5d] ", num);
+	op_print(pc, op);
+	printf("\n");
+}
+
+void debug_step(void)
+{
+	display_saveCursor();
+	getchar();
+	display_loadCursor();
+}
 
 void debug_start(void)
 {
@@ -27,11 +43,20 @@ void debug_start(void)
 	}
 }
 
-int str_count(char* str, char c)
+void debug_clear(void)
 {
-	int i;
-	for (i=0; str[i]; str[i]==c ? i++ : *str++);
-	return i;
+	display_gotoxy(DEBUG_X_MIN, DEBUG_Y_MIN);
+	printf("                                            \n");
+	printf("                                            \n");
+	printf("                                            \n");
+	printf("                                            \n");
+	printf("                                            \n");
+	printf("                                            \n");
+	printf("                                            \n");
+	printf("                                            \n");
+	printf("                                            \n");
+	printf("                                            \n");
+	display_gotoxy(DEBUG_X_MIN, DEBUG_Y_MIN);
 }
 
 void debug_end(void)
@@ -49,21 +74,9 @@ void debug_end(void)
 	}
 	
 	display_saveCursor();
-	display_gotoxy(DEBUG_X_MIN, DEBUG_Y_MIN);
-	printf("                                            \n");
-	printf("                                            \n");
-	printf("                                            \n");
-	printf("                                            \n");
-	printf("                                            \n");
-	printf("                                            \n");
-	printf("                                            \n");
-	printf("                                            \n");
-	printf("                                            \n");
-	printf("                                            \n");
-	display_gotoxy(DEBUG_X_MIN, DEBUG_Y_MIN);
+	debug_clear();
 	printf("%s", debug_buffer);
 	printf("                                            ");
 	debug_idx = strlen(debug_buffer);
-	display_gotoxy(DEBUG_X_MIN, DEBUG_Y_MAX);
 	display_loadCursor();
 }

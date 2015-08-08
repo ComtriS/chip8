@@ -3,6 +3,8 @@
 
 void debug_start(void);
 void debug_end(void);
+void debug_step(void);
+void debug_op(int num, uint8_t pc, uint8_t op);
 
 extern char debug_buffer[];
 extern int debug_idx;

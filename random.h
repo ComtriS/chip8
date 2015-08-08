@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-uint8_t random_u8(void);
+uint8_t random_byte(void);
 
 #endif /* __RANDOM_H__ */

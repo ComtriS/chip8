@@ -2,20 +2,17 @@
 #include <stdio.h>
 #include "font.h"
 #include "system.h"
-
-// Display resolution is 64×32 pixels, and color is monochrome. Graphics are
-// drawn to the screen solely by drawing sprites, which are 8 pixels wide and
-// may be from 1 to 15 pixels in height. Sprite pixels that are set flip the
-// color of the corresponding screen pixel, while unset sprite pixels do
-// nothing. The carry flag (VF) is set to 1 if any screen pixels are flipped
-// from set to unset when a sprite is drawn and set to 0 otherwise.
+#include "bit.h"
 
 #define DISPLAY_ESC     0x1B
-#define DISPLAY_BLOCK   "%c%c%c", 0xe2, 0x96, 0x88
-#define DISPLAY_BLANK   " "
 
+// Display resolution is 64×32 pixels
 #define DISPLAY_MAX_X   64
 #define DISPLAY_MAX_Y   32
+
+// Display color is monochrome (represented here by '█' and ' ')
+#define DISPLAY_BLOCK   "%c%c%c", 0xe2, 0x96, 0x88
+#define DISPLAY_BLANK   " "
 
 #define DISPLAY_UD   "%c%c%c", 0xe2, 0x94, 0x83
 #define DISPLAY_LR   "%c%c%c", 0xe2, 0x94, 0x81
@@ -131,14 +128,6 @@ void display_toggle(int x, int y)
 	
 	display_screen[x][y] ^= 1;
 	display_update(x, y);
-}
-
-uint8_t bit_reverse(uint8_t b)
-{
-	b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
-	b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
-	b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
-	return b;
 }
 
 bool display_drawLine(int x, int y, uint8_t line)

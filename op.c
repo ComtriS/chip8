@@ -7,39 +7,90 @@
 #include "random.h"
 #include "key.h"
 #include "font.h"
+#include "stack.h"
 
-void stack_push(uint16_t data)
+void op_print(uint16_t pc, uint16_t op)
 {
-	// push stack
-	chip8.SP -= SYSTEM_INST_SIZE;
+	printf("%04X %04X  ", pc, op);
+	uint8_t nibble1 = op >> 12 & 0xF;
+	uint8_t nibble2 = op >> 8  & 0xF;
+	uint8_t nibble3 = op >> 4  & 0xF;
+	uint8_t nibble4 = op >> 0  & 0xF;
+	uint8_t byte2   = op >> 0  & 0xFF;
+	uint16_t nnn    = op & 0xFFF;
 	
-	// save on stack
-	chip8.ram.bytes[chip8.SP+0] = data >> 8;
-	chip8.ram.bytes[chip8.SP+1] = data & 0xFF;
+	switch (nibble1) {
+		case 0x0: 
+			switch (byte2) {
+				case 0xE0: printf("%-10s", "CLS"); return;
+				case 0xEE: printf("%-10s", "RTS"); return;
+			}
+			break;
+		case 0x1: printf("%-10s $%03X",        "JUMP",    nnn);              return;
+		case 0x2: printf("%-10s $%03X",        "CALL",    nnn);              return;
+		case 0x3: printf("%-10s V%01X,#$%02X", "SKIP.EQ", nibble2, byte2);   return;
+		case 0x4: printf("%-10s V%01X,#$%02X", "SKIP.NE", nibble2, byte2);   return;
+		case 0x5: printf("%-10s V%01X,V%01X",  "SKIP.EQ", nibble2, nibble3); return;
+		case 0x6: printf("%-10s V%01X,#$%02X", "MVI",     nibble2, byte2);   return;
+		case 0x7: printf("%-10s V%01X,#$%02X", "ADI",     nibble2, byte2);   return;
+		case 0x8:
+			switch (nibble4) {
+				case 0x0: printf("%-10s V%01X,V%01X",       "MOV.", nibble2, nibble3);          return;
+				case 0x1: printf("%-10s V%01X,V%01X",       "OR. ", nibble2, nibble3);          return;
+				case 0x2: printf("%-10s V%01X,V%01X",       "AND.", nibble2, nibble3);          return;
+				case 0x3: printf("%-10s V%01X,V%01X",       "XOR.", nibble2, nibble3);          return;
+				case 0x4: printf("%-10s V%01X,V%01X",       "ADD.", nibble2, nibble3);          return;
+				case 0x5: printf("%-10s V%01X,V%01X,V%01X", "SUB.", nibble2, nibble2, nibble3); return;
+				case 0x6: printf("%-10s V%01X,V%01X",       "SHR.", nibble2, nibble3);          return;
+				case 0x7: printf("%-10s V%01X,V%01X,V%01X", "SUB.", nibble2, nibble3, nibble3); return;
+				case 0xe: printf("%-10s V%01X,V%01X",       "SHL.", nibble2, nibble3);          return;
+			}
+			break;
+		case 0x9: printf("%-10s V%01X,V%01X",        "SKIP.NE", nibble2, nibble3);          return;
+		case 0xa: printf("%-10s I,#$%03X",           "MVI",     nnn);                       return;
+		case 0xb: printf("%-10s $%03X(V0)",          "JUMP",    nnn);                       return;
+		case 0xc: printf("%-10s V%01X,#$%02X",       "RNDMSK",  nibble2, byte2);            return;
+		case 0xd: printf("%-10s V%01X,V%01X,#$%01X", "SPRITE",  nibble2, nibble3, nibble4); return;
+		case 0xe: 
+			switch (byte2) {
+				case 0x9E: printf("%-10s V%01X", "SKIPKEY.Y", nibble2); return;
+				case 0xA1: printf("%-10s V%01X", "SKIPKEY.N", nibble2); return;
+			}
+			break;
+		case 0xf: 
+			switch (byte2) {
+				case 0x07: printf("%-10s V%01X,DELAY",  "MOV",        nibble2); return;
+				case 0x0a: printf("%-10s V%01X",        "KEY",        nibble2); return;
+				case 0x15: printf("%-10s DELAY,V%01X",  "MOV",        nibble2); return;
+				case 0x18: printf("%-10s SOUND,V%01X",  "MOV",        nibble2); return;
+				case 0x1e: printf("%-10s I,V%01X",      "ADI",        nibble2); return;
+				case 0x29: printf("%-10s I,V%01X",      "SPRITECHAR", nibble2); return;
+				case 0x33: printf("%-10s (I),V%01X",    "MOVBCD",     nibble2); return;
+				case 0x55: printf("%-10s (I),V0-V%01X", "MOVM",       nibble2); return;
+				case 0x65: printf("%-10s V0-V%01X,(I)", "MOVM",       nibble2); return;
+			}
+			break;
+	}
+	
+	printf("**ERROR**");
 }
 
-uint16_t stack_pop(void)
+void op_dump(void)
 {
-	// load from stack
-	uint16_t data = chip8.ram.bytes[chip8.SP+0];
-	data <<= 8;
-	data |= chip8.ram.bytes[chip8.SP+1];
+	uint16_t* rom = system_getRom();
+	size_t size   = system_getSize();
 	
-	// pop stack
-	chip8.SP += SYSTEM_INST_SIZE;
-	
-	return data;
+	int i;
+	for (i=0; i<size; i++) {
+		op_print(i + SYSTEM_BASE_PC, rom[i]);
+		printf("\n");
+	}
 }
 
 static int op_error(word_t op)
 {
 	printf("ERROR: instruction not recognized (0x%04X)\n", op);
 	return OP_ERR_BAD_INST;
-}
-
-void op_print(word_t op)
-{
-	printf("0x%04X", op);
 }
 
 const char* op_status(int status)
@@ -95,14 +146,13 @@ static int op_1XXX(word_t op)
 {
 	int nnn = (op >> 0) & 0xFFF;
 	
-	if (chip8.PC == nnn) {
-		printf("ERROR: infinite loop detected. Halting.\n");
-		system_halt();
-	}
+	if (chip8.PC == nnn)
+		system_halt();  // infinite loop detected
 	
 	chip8.PC = nnn;
 	
-	system_decPC();    // to avoid later increment
+	// to avoid later increment
+	system_decPC();
 	return SUCCESS;
 }
 
@@ -197,7 +247,7 @@ static int op_8XXX(word_t op)
 		case 0x3: v[x] ^= v[y]; break; // 8XY3	Sets VX to VX xor VY.
 		
 		case 0x4:   // 8XY4	Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
-			REG_VF = (v[x] > 0xFF - v[y]) ? 1 : 0;   // TODO: magic number
+			REG_VF = (v[x] > 0xFF - v[y]) ? 1 : 0;
 			v[x] += v[y];
 			break;
 		case 0x5:   // 8XY5	VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
@@ -213,7 +263,7 @@ static int op_8XXX(word_t op)
 			v[x] = v[y] - v[x];
 			break;
 		case 0xE:   // 8XYE	Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
-			REG_VF = v[x] >> 7;   // TODO: magic number
+			REG_VF = v[x] >> 7;
 			v[x] <<= 1;
 			break;
 		default:
@@ -252,7 +302,8 @@ static int op_BXXX(word_t op)
 	
 	chip8.PC = nnn + chip8.V[0];
 	
-	system_decPC();    // to avoid later increment
+	// to avoid later increment
+	system_decPC();
 	return SUCCESS;
 }
 
@@ -262,21 +313,17 @@ static int op_CXXX(word_t op)
 	int x  = (op >> 8) & 0xF;
 	int nn = (op >> 0) & 0xFF;
 	
-	chip8.V[x] = random_u8() & nn;
+	chip8.V[x] = random_byte() & nn;
 	
 	return SUCCESS;
 }
 
-// DXYN: Sprites stored in memory at location in index register (I), maximum
-// 8bits wide. Wraps around the screen. If when drawn, clears a pixel, register
-// VF is set to 1 otherwise it is zero. All drawing is XOR drawing (i.e. it
-// toggles the screen pixels)
-//
-// Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a
-// height of N pixels. Each row of 8 pixels is read as bit-coded (with the most
-// significant bit of each byte displayed on the left) starting from memory
-// location I; I value doesn’t change after the execution of this instruction.
-// As described above, VF is set to 1 if any screen pixels are flipped from set
+// DXYN: Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and
+// a height of N pixels (1 to 15). Wraps around the screen. Each row of 8 pixels
+// is read as bit-coded (with the most significant bit of each byte displayed on
+// the left) starting from memory location I; I value doesn’t change after the
+// execution of this instruction. All drawing is XOR drawing (i.e. it toggles
+// the screen pixels) VF is set to 1 if any screen pixels are flipped from set
 // to unset when the sprite is drawn, and to 0 if that doesn’t happen.
 static int op_DXXX(word_t op)
 {
@@ -288,13 +335,9 @@ static int op_DXXX(word_t op)
 	
 	REG_VF = 0;
 	
-	//static int count = 0;
-	
 	int i;
 	for (i=0; i<n; i++) {
 		uint8_t line = sprite[i];
-		//printf("%d] SPRITE %d: drawing 0x%02X [0x%04X] at %d,%d\n", count++, n+1, line, chip8.I+i, chip8.V[x], chip8.V[y]);
-		//getchar();
 		bool unset = display_drawLine(chip8.V[x], chip8.V[y]+i, line);
 		if (unset)
 			REG_VF = 1;
