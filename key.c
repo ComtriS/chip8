@@ -59,6 +59,8 @@ void* key_thread(void* arg)
 		
 		if (key < 0x0 || key > 0xF)
 			continue;
+		if (key == 0x0 && c != '0')
+			continue;
 		
 		pthread_mutex_lock(&key_mutex);
 		
