@@ -3,12 +3,13 @@
 CC=gcc
 CFLAGS=-Wall -Werror -g
 
-BINDIR=bin
+SRCDIR=src
 OBJDIR=obj
+BINDIR=bin
 ROMDIR=roms
 
-SRCS=$(wildcard *.c)
-OBJS=$(patsubst %,$(OBJDIR)/%,$(patsubst %.c,%.o,${SRCS}))
+SRCS=$(wildcard ${SRCDIR}/*.c)
+OBJS=$(patsubst ${SRCDIR}/%,$(OBJDIR)/%,$(patsubst %.c,%.o,${SRCS}))
 LIBS=-lpthread
 ARGS=
 ifeq ($(DEBUG),1)
@@ -29,7 +30,7 @@ ${BINDIR} ${OBJDIR}:
 	@echo "MKDIR  $@"
 	@mkdir -p $@
 
-${OBJDIR}/%.o: %.c | ${OBJDIR}
+${OBJDIR}/%.o: ${SRCDIR}/%.c | ${OBJDIR}
 	@echo "   CC  $< => $@"
 	@$(CC) -c -o $@ $< $(CFLAGS) $(LIBS)
 
