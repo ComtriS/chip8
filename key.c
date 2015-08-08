@@ -1,32 +1,30 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
+#include <termios.h>
+#include <unistd.h>
+#include <pthread.h>
 #include "system.h"
 #include "errors.h"
 
-// special stuff:
-#include <stdio.h>
-#include <termios.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/time.h>
-
-// special stuff:
-#include <pthread.h>
+bool key_waiting = false;
+uint8_t key_received;
+pthread_cond_t key_cond;
+pthread_mutex_t key_mutex;
+pthread_t key_thread_handle;
 
 void key_mode(int dir)
 {
 	static struct termios oldt, newt;
- 	
+	
 	if (dir == 1) {
-		//system("/bin/stty raw");
 		tcgetattr(STDIN_FILENO, &oldt);
 		newt = oldt;
 		newt.c_lflag &= ~( ICANON | ECHO );
 		tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 	} else {
-		//system("/bin/stty cooked");
 		tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 	}
 }
@@ -40,17 +38,17 @@ bool key_pressed(uint8_t key)
 	return false;
 }
 
-bool key_waiting = false;
-uint8_t key_received;
-
 uint8_t key_get(void)
 {
-	key_waiting = true;
-	while (1) {
-		usleep(100000);
-		if (!key_waiting)
-			return key_received;
-	}
+	pthread_mutex_lock(&key_mutex);
+	pthread_cond_wait(&key_cond, &key_mutex);
+	
+	chip8.keys[key_received] = 0;
+	uint8_t key = key_received;
+	
+	pthread_mutex_unlock(&key_mutex);
+	
+	return key;
 }
 
 void* key_thread(void* arg)
@@ -62,11 +60,13 @@ void* key_thread(void* arg)
 		if (key < 0x0 || key > 0xF)
 			continue;
 		
+		pthread_mutex_lock(&key_mutex);
+		
 		chip8.keys[key] = 1;
-		if (key_waiting) {
-			key_received = key;
-			key_waiting = false;
-		}
+		key_received = key;
+		
+		pthread_cond_signal(&key_cond);
+		pthread_mutex_unlock(&key_mutex);
 	}
 }
 
@@ -77,19 +77,30 @@ void key_clear(void)
 
 int key_init(void)
 {
-	key_clear();
-	key_mode(1);
-	
-	pthread_t thread;
-	if (pthread_create(&thread, NULL, key_thread, NULL)) {
-		fprintf(stderr, "ERROR: couldn't create thread\n");
+	if (pthread_cond_init(&key_cond, NULL) != 0) {
+		fprintf(stderr, "ERROR: pthread_cond_init\n");
 		return ERR_GENERIC;
 	}
 	
+	if (pthread_mutex_init(&key_mutex, NULL) != 0) {
+		fprintf(stderr, "ERROR: pthread_mutex_init\n");
+		return ERR_GENERIC;
+	}
+	
+	if (pthread_create(&key_thread_handle, NULL, key_thread, NULL) != 0) {
+		fprintf(stderr, "ERROR: pthread_create\n");
+		return ERR_GENERIC;
+	}
+	
+	key_clear();
+	key_mode(1);
 	return SUCCESS;
 }
 
 void key_deinit(void)
 {
+	pthread_cond_destroy(&key_cond);
+	pthread_mutex_destroy(&key_mutex);
+	pthread_cancel(key_thread_handle);
 	key_mode(0);
 }
