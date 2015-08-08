@@ -107,7 +107,6 @@ void display_clear(void)
 void display_init(void)
 {
 	display_inited = true;
-	memcpy(chip8.ram.font, font_chars, sizeof(font_chars));
 	display_clear();
 }
 

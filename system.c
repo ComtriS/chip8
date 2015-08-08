@@ -4,13 +4,12 @@
 #include <stdlib.h>
 #include <endian.h>
 #include <assert.h>
-#include "system.h"
-#include "errors.h"
 #include "op.h"
 #include "display.h"
 #include "debug.h"
 #include "dasm.h"
 #include "clock.h"
+#include "font.h"
 
 system_t chip8 = {{0}};
 uint16_t* rom_bin = NULL;
@@ -36,6 +35,7 @@ void system_init(void)
 	memset(&chip8, 0, sizeof(chip8));
 	chip8.SP = SYSTEM_BASE_SP;
 	chip8.PC = SYSTEM_BASE_PC;
+	memcpy(chip8.ram.font, font_chars, sizeof(font_chars));
 }
 
 int system_load(const char* rom)

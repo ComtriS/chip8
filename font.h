@@ -3,7 +3,9 @@
 
 #include <stdint.h>
 
-#define FONT_SIZE   5*16   // 5 bytes per char, 16 chars
+#define FONT_BYTES_PER_CHAR    5
+#define FONT_CHAR_COUNT        16
+#define FONT_SIZE              (FONT_BYTES_PER_CHAR * FONT_CHAR_COUNT)
 
 extern uint8_t font_chars[FONT_SIZE];
 

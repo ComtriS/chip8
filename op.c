@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "random.h"
 #include "key.h"
+#include "font.h"
 
 void stack_push(uint16_t data)
 {
@@ -390,7 +391,8 @@ static int op_FX29(word_t op)
 {
 	int x  = (op >> 8) & 0xF;
 	
-	chip8.I = 0 + 5 * chip8.V[x]; // TODO: 0 is a magic number (FONT_BASE)
+	uint8_t font_addr = chip8.ram.bytes - chip8.ram.font;
+	chip8.I = font_addr + FONT_BYTES_PER_CHAR * chip8.V[x];
 	
 	return SUCCESS;
 }
