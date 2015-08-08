@@ -36,6 +36,11 @@ int system_load(const char* rom)
 	size_t file_size = ftell(file);
 	fseek(file, 0, SEEK_SET);
 	
+	if (file_size > sizeof(chip8.ram.program)) {
+		fclose(file);
+		return ERR_GENERIC;
+	}
+	
 	rom_bin = malloc(file_size);
 	fread(rom_bin, 1, file_size, file);
 	fclose(file);
