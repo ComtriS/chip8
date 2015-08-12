@@ -78,27 +78,34 @@ word_t system_nextOp(void)
 
 void system_start(bool debug, bool step)
 {
-	debug_enabled = debug || step;
-	
+	debug_enabled      = debug || step;
 	clock_t start_time = clock();
 	int total_inst     = 0;
-	int status         = SUCCESS;
 	
-	while (status == SUCCESS) {
+	while (1) {
 		clock_t expected_time = start_time + (total_inst * TICKS_PER_INST);
-		clock_t diff_time = (clock() - expected_time);
-		if (diff_time < TICKS_PER_INST)
-			continue;
+		clock_t diff_time;
+		
+		do {
+			diff_time = (clock() - expected_time);
+		} while (diff_time < TICKS_PER_INST);
 		
 		int inst_count = diff_time / TICKS_PER_INST;
 		
-		while (status == SUCCESS && inst_count--) {
+		while (inst_count--) {
 			word_t op = system_nextOp();
 			
 			if (debug)
 				debug_op(total_inst, chip8.PC, op);
 			
-			status = op_do(op);
+			int status = op_do(op);
+			
+			if (status != SUCCESS) {
+				// NOTE: this is generally not an issue, as most ROMs deliberately cause
+				// an infinite loop when the intention is to signal program termination
+				fprintf(stderr, "ERROR: %s\n", op_status(status));
+				return;
+			}
 			
 			if (step)
 				debug_step();
@@ -106,12 +113,11 @@ void system_start(bool debug, bool step)
 			total_inst++;
 		}
 	}
-	
-	printf("ERROR: %s\n", op_status(status));
 }
 
 void system_halt(void)
 {
+	system_destroy();
 	exit(1);
 }
 

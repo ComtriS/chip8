@@ -36,14 +36,19 @@ int main(int argc, char** argv)
 	if (system_init() != SUCCESS)
 		return ERR_GENERIC;
 	
-	if (system_load(file) != SUCCESS)
-		return ERR_GENERIC;
+	int status = system_load(file);
+	
+	if (status != SUCCESS)
+		goto done;
 	
 	if (dasm) {
 		op_dump();
-		return SUCCESS;
+		goto done;
 	}
 	
 	system_start(debug, step);
-	return SUCCESS;
+	
+done:
+	system_destroy();
+	return status;
 }
