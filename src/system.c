@@ -11,8 +11,11 @@ system_t  chip8    = {{0}};
 uint16_t* rom_bin  = NULL;
 size_t    rom_size = 0;
 
-#define BYTES_PER_PC    2
-#define TICKS_PER_INST  (CLOCKS_PER_SEC / 60.0f)
+#define BYTES_PER_PC         2
+#define TIMER_SPEED_HZ       60.0f
+#define INST_PER_SEC_MULT    6
+#define INST_PER_SEC         (INST_PER_SEC_MULT * TIMER_SPEED_HZ)
+#define TICKS_PER_INST       (CLOCKS_PER_SEC / INST_PER_SEC)
 
 int system_init(void)
 {
@@ -51,6 +54,11 @@ int system_load(const char* rom)
 	return SUCCESS;
 }
 
+void system_beep(void)
+{
+	printf("\a");
+}
+
 size_t system_getSize(void)
 {
 	return rom_size;
@@ -69,6 +77,20 @@ void system_incPC(void)
 void system_decPC(void)
 {
 	chip8.PC -= SYSTEM_INST_SIZE;
+}
+
+void system_decTimers(int op_count)
+{
+	if (op_count % INST_PER_SEC_MULT == 0) {
+		if (chip8.delay_timer > 0)
+			chip8.delay_timer--;
+		
+		if (chip8.sound_timer > 0) {
+			chip8.sound_timer--;
+			if (chip8.sound_timer == 0)
+				system_beep();
+		}
+	}
 }
 
 word_t system_nextOp(void)

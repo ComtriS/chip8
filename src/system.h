@@ -44,14 +44,15 @@ typedef struct system {
 
 extern system_t chip8;
 
-int       system_init    (void);
-size_t    system_getSize (void);
-uint16_t* system_getRom  (void);
-void      system_incPC   (void);
-void      system_decPC   (void);
-void      system_start   (bool debug, bool step);
-int       system_load    (const char* rom);
-void      system_halt    (void);
-void      system_destroy (void);
+int       system_init      (void);
+size_t    system_getSize   (void);
+uint16_t* system_getRom    (void);
+void      system_incPC     (void);
+void      system_decPC     (void);
+void      system_decTimers (int op_count);
+void      system_start     (bool debug, bool step);
+int       system_load      (const char* rom);
+void      system_halt      (void);
+void      system_destroy   (void);
 
 #endif /* __SYSTEM_H__ */
