@@ -96,6 +96,7 @@ void display_clear(void)
 	if (!display_inited)
 		return;
 	
+	printf("\033[1;1H\033[2J\033[3J");
 	memset(display_screen, 0, sizeof(display_screen));
 	display_drawBox(0, DISPLAY_MAX_X+1, 0, DISPLAY_MAX_Y+1);
 	fflush(stdout);
