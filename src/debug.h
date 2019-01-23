@@ -14,6 +14,7 @@ extern bool debug_enabled;
 	do {                                                             \
 		debug_start();                                               \
 		debug_idx += sprintf(&debug_buffer[debug_idx], __VA_ARGS__); \
+		debug_idx += sprintf(&debug_buffer[debug_idx], "\n");        \
 		debug_end();                                                 \
 	} while (0)
 
